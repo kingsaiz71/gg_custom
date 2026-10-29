@@ -32,7 +32,7 @@ add_action('manage_post_posts_custom_column', static function ($column, $post_id
         return;
     }
     $raw = get_post_meta($post_id, 'retombee_publiee', true);
-    $value = $raw === 'apubliee' ? 'apubliee' : 'publiee';
+    $value = $raw === 'publiee' ? 'publiee' : 'apubliee';
     $is_published = $value === 'publiee';
     $label = $is_published ? 'Publiée' : 'À publier';
     $color = $is_published ? '#16743d' : '#b42318';
@@ -49,7 +49,7 @@ add_action('quick_edit_custom_box', static function ($column, $post_type) {
     echo '<fieldset class="inline-edit-col-right"><div class="inline-edit-col">';
     echo '<label><span class="title">Retombées</span>';
     echo '<select name="gdd_retombee_publiee_quick">';
-    echo '<option value="publiee">Publiée</option>';
+    echo '<option value="apubliee">À publier</option>';
     echo '<option value="apubliee">À publier</option>';
     echo '</select></label></div></fieldset>';
 }, 10, 2);
@@ -74,7 +74,7 @@ add_action('admin_footer-edit.php', static function () {
             var state = row.querySelector('.gdd-retombee-value');
             var select = editor.querySelector('select[name="gdd_retombee_publiee_quick"]');
             if (select) {
-                select.value = state && state.getAttribute('data-value') === 'apubliee' ? 'apubliee' : 'publiee';
+                select.value = state && state.getAttribute('data-value') === 'publiee' ? 'publiee' : 'apubliee';
             }
         };
     })();
