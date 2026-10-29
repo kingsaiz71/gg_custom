@@ -24,9 +24,11 @@ jobs:
           test -s gdd-fonctions-personnalisees.php
           test -s fonctions-originales.php
           test -s github-updater.php
+          test -s quick-edit-retombee.php
           php -l gdd-fonctions-personnalisees.php
           php -l fonctions-originales.php
           php -l github-updater.php
+          php -l quick-edit-retombee.php
 
       - name: Construire le ZIP WordPress depuis les sources
         id: package
@@ -47,6 +49,7 @@ jobs:
           cp gdd-fonctions-personnalisees.php dist/gdd-fonctions-personnalisees/
           cp fonctions-originales.php dist/gdd-fonctions-personnalisees/includes/
           cp github-updater.php dist/gdd-fonctions-personnalisees/includes/
+          cp quick-edit-retombee.php dist/gdd-fonctions-personnalisees/includes/
           cp README.md dist/gdd-fonctions-personnalisees/
           archive="gdd-fonctions-personnalisees-v$version.zip"
           (cd dist && zip -q -r "../$archive" gdd-fonctions-personnalisees)
