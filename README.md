@@ -1,25 +1,23 @@
-# GG Custom — Gens de Goût
+# Gens de Goût – Fonctions personnalisées (v1.0.0)
 
-Plugin WordPress personnalisé du site Gens de Goût.
+Extension autonome construite à partir de l'intégralité du code PHP transmis (23/10/2026). Le fichier source n'est pas modifié dans cette version.
 
-## Version initiale
+## Installation sécurisée
+1. Sauvegarder `wp-content/themes/[theme-actif]/functions.php` et le site.
+2. WordPress > Extensions > Ajouter une extension > Téléverser une extension : sélectionner le ZIP et l'activer.
+3. Tant que les fonctions personnalisées existent dans `functions.php`, le plugin affiche un **avertissement** et ne charge pas son propre code, afin d'éviter l'erreur PHP `Cannot redeclare`. Le code du thème continue de fonctionner.
+4. Supprimer **uniquement le code personnalisé correspondant** de `functions.php` (ne pas vider les fonctions natives Divi et ne pas effacer le fichier entier). Si le fichier actif a été entièrement créé par vous, conserver au minimum un fichier PHP valide.
+5. Recharger l'administration puis vérifier la disparition de l'avertissement. Purger le cache Divi/cache du site et tester les pages.
+6. Vérifier particulièrement `[gdd_blog_grid category="3" posts="15" balance_chefs="true"]`, `[gdd_recipe_search]`, `[gdd_recipe_search_header]`, `[articles_aleatoires]`, `[article_aleatoire_categorie_3]` et `[gdd_share_article]`.
+7. Vérifier que les valeurs Yoast sont toujours accessibles via REST pour Make, ainsi que les colonnes ACF dans Articles.
 
-L'archive originale `gdd-fonctions-personnalisees-v1.0.0.zip` contient le dossier `gdd-fonctions-personnalisees/`, le point d'entrée `gdd-fonctions-personnalisees.php`, le fichier `includes/fonctions-originales.php` et un `README.md`.
+**Important :** Si une autre extension définit déjà une de ces fonctions, la même protection laisse le code de cette extension prioritaire et affiche un avertissement. Le plugin doit être chargé seul pour reproduire intégralement son comportement.
 
-## Installation
+## Contenu
+- `gdd-fonctions-personnalisees.php` : amorçage et contrôle des collisions.
+- `includes/fonctions-originales.php` : code PHP complet fourni par l'utilisateur.
 
-Dans WordPress : **Extensions > Ajouter une extension > Téléverser une extension**, puis sélectionner l'archive ZIP correspondante.
-
-**Attention :** ne pas réinstaller ni remplacer le plugin du site de production sans sauvegarde préalable et vérification des fonctions et shortcodes.
-
-## Versions
-
-Utiliser une étiquette Git `vX.Y.Z` (ex. `v1.0.0`) et publier le ZIP correspondant dans **GitHub Releases**.
-
-Le workflow `.github/workflows/release.yml` est déclenché par une étiquette `v*` et publie l'archive ZIP dans la release. Les mises à jour automatiques sur un WordPress utilisant un dépôt privé **ne sont pas configurées** : elles nécessitent un dispositif d'authentification sécurisé côté serveur et un mécanisme de mise à jour spécifique.
-
-## Développement
-
-La version actuelle est conservée sous forme ZIP. Pour rendre les modifications traçables, importer ensuite les fichiers sources PHP en clair dans ce dépôt (sans supprimer l'archive d'origine).
-
-Ne jamais committer d'identifiants, tokens GitHub ou secrets WordPress.
+## Limites
+- Le CSS hors `functions.php` (CSS personnalisé Divi, feuille de style du thème, etc.) n'est pas inclus.
+- La source conserve la logique et les requêtes existantes, sans refonte des performances.
+- Aucun test sur le WordPress de production n'a été effectué : tester après installation.
