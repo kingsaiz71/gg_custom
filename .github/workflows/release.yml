@@ -1,0 +1,54 @@
+name: Publier le ZIP du plugin
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+      - name: Verifier et identifier le ZIP
+        id: archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          archives=(gdd-fonctions-personnalisees-v*.zip)
+          if [ "${#archives[@]}" -ne 1 ]; then
+            echo "Une seule archive versionnee doit etre presente dans la racine du depot." >&2
+            exit 1
+          fi
+          unzip -t "${archives[0]}"
+          echo "path=${archives[0]}" >> "$GITHUB_OUTPUT"
+          version="${archives[0]#gdd-fonctions-personnalisees-}"
+          version="${version%.zip}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Publier la release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARCHIVE: ${{ steps.archive.outputs.path }}
+          VERSION: ${{ steps.archive.outputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            TAG="$GITHUB_REF_NAME"
+          else
+            TAG="$VERSION"
+          fi
+          if [[ "$TAG" != "$VERSION" ]]; then
+            echo "Le tag $TAG ne correspond pas a la version ZIP $VERSION." >&2
+            exit 1
+          fi
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$ARCHIVE" --clobber
+          else
+            gh release create "$TAG" "$ARCHIVE" --title "GG Custom $TAG" --notes "Archive du plugin WordPress GG Custom — $TAG"
+          fi
