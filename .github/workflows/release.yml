@@ -1,4 +1,4 @@
-name: Publier le ZIP du plugin
+name: Construire et publier le plugin WordPress
 
 on:
   push:
@@ -13,42 +13,59 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - name: Recuperer le depot
+      - name: Recuperer les sources
         uses: actions/checkout@v4
-      - name: Verifier et identifier le ZIP
-        id: archive
+
+      - name: Verifier les sources PHP
+        run: |
+          set -euo pipefail
+          test -s gdd-fonctions-personnalisees.php
+          test -s fonctions-originales.php
+          php -l gdd-fonctions-personnalisees.php
+          php -l fonctions-originales.php
+
+      - name: Construire le ZIP WordPress depuis les sources
+        id: package
         shell: bash
         run: |
           set -euo pipefail
-          shopt -s nullglob
-          archives=(gdd-fonctions-personnalisees-v*.zip)
-          if [ "${#archives[@]}" -ne 1 ]; then
-            echo "Une seule archive versionnee doit etre presente dans la racine du depot." >&2
+          version="$(sed -nE 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' gdd-fonctions-personnalisees.php | head -n 1)"
+          if [[ -z "$version" ]]; then
+            echo "Version du plugin introuvable." >&2
             exit 1
           fi
-          unzip -t "${archives[0]}"
-          echo "path=${archives[0]}" >> "$GITHUB_OUTPUT"
-          version="${archives[0]#gdd-fonctions-personnalisees-}"
-          version="${version%.zip}"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-      - name: Publier la release
+          tag="v$version"
+          if [[ "$GITHUB_REF_TYPE" == "tag" && "$GITHUB_REF_NAME" != "$tag" ]]; then
+            echo "Le tag ne correspond pas a la version declaree dans le plugin." >&2
+            exit 1
+          fi
+          mkdir -p dist/gdd-fonctions-personnalisees/includes
+          cp gdd-fonctions-personnalisees.php dist/gdd-fonctions-personnalisees/
+          cp fonctions-originales.php dist/gdd-fonctions-personnalisees/includes/
+          cp README.md dist/gdd-fonctions-personnalisees/
+          archive="gdd-fonctions-personnalisees-v$version.zip"
+          (cd dist && zip -q -r "../$archive" gdd-fonctions-personnalisees)
+          unzip -t "$archive"
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Publier GitHub Release
+        if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
-          ARCHIVE: ${{ steps.archive.outputs.path }}
-          VERSION: ${{ steps.archive.outputs.version }}
+          ARCHIVE: ${{ steps.package.outputs.archive }}
+          TAG: ${{ steps.package.outputs.tag }}
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
-            TAG="$GITHUB_REF_NAME"
-          else
-            TAG="$VERSION"
-          fi
-          if [[ "$TAG" != "$VERSION" ]]; then
-            echo "Le tag $TAG ne correspond pas a la version ZIP $VERSION." >&2
-            exit 1
-          fi
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$ARCHIVE" --clobber
           else
-            gh release create "$TAG" "$ARCHIVE" --title "GG Custom $TAG" --notes "Archive du plugin WordPress GG Custom — $TAG"
+            gh release create "$TAG" "$ARCHIVE" --title "GG Custom $TAG" --notes "Plugin WordPress — version $TAG"
           fi
+
+      - name: Conserver le ZIP comme artefact du workflow
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-wordpress
+          path: ${{ steps.package.outputs.archive }}
