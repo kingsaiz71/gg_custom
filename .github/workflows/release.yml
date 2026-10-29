@@ -2,6 +2,8 @@ name: Construire et publier le plugin WordPress
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
   workflow_dispatch:
