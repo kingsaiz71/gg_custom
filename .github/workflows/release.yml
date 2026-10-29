@@ -23,8 +23,10 @@ jobs:
           set -euo pipefail
           test -s gdd-fonctions-personnalisees.php
           test -s fonctions-originales.php
+          test -s github-updater.php
           php -l gdd-fonctions-personnalisees.php
           php -l fonctions-originales.php
+          php -l github-updater.php
 
       - name: Construire le ZIP WordPress depuis les sources
         id: package
@@ -44,6 +46,7 @@ jobs:
           mkdir -p dist/gdd-fonctions-personnalisees/includes
           cp gdd-fonctions-personnalisees.php dist/gdd-fonctions-personnalisees/
           cp fonctions-originales.php dist/gdd-fonctions-personnalisees/includes/
+          cp github-updater.php dist/gdd-fonctions-personnalisees/includes/
           cp README.md dist/gdd-fonctions-personnalisees/
           archive="gdd-fonctions-personnalisees-v$version.zip"
           (cd dist && zip -q -r "../$archive" gdd-fonctions-personnalisees)
