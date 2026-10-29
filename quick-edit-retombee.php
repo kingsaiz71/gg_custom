@@ -1,7 +1,7 @@
 <?php
 /**
  * Colonne et modification rapide du champ ACF radio retombee_publiee.
- * Choix réels : publiee / apubliee. Les articles sans valeur sont affichés Publiée.
+ * Choix réels : publiee / apubliee. Les articles sans valeur sont affichés À publier.
  */
 if (!defined('ABSPATH')) {
     exit;
@@ -47,11 +47,10 @@ add_action('quick_edit_custom_box', static function ($column, $post_type) {
     }
     wp_nonce_field('gdd_retombee_quick_edit', 'gdd_retombee_quick_nonce');
     echo '<fieldset class="inline-edit-col-right"><div class="inline-edit-col">';
-    echo '<label><span class="title">Retombées</span>';
-    echo '<select name="gdd_retombee_publiee_quick">';
-    echo '<option value="apubliee">À publier</option>';
-    echo '<option value="apubliee">À publier</option>';
-    echo '</select></label></div></fieldset>';
+    echo '<span class="title">Retombées</span>';
+    echo '<label class="alignleft"><input type="radio" name="gdd_retombee_publiee_quick" value="publiee"> Publiée</label>';
+    echo '<label class="alignleft"><input type="radio" name="gdd_retombee_publiee_quick" value="apubliee" checked> À publier</label>';
+    echo '</div></fieldset>';
 }, 10, 2);
 
 add_action('admin_footer-edit.php', static function () {
@@ -72,10 +71,9 @@ add_action('admin_footer-edit.php', static function () {
             var editor = document.getElementById('edit-' + postId);
             if (!row || !editor) { return; }
             var state = row.querySelector('.gdd-retombee-value');
-            var select = editor.querySelector('select[name="gdd_retombee_publiee_quick"]');
-            if (select) {
-                select.value = state && state.getAttribute('data-value') === 'publiee' ? 'publiee' : 'apubliee';
-            }
+            var value = state && state.getAttribute('data-value') === 'publiee' ? 'publiee' : 'apubliee';
+            var radio = editor.querySelector('input[name="gdd_retombee_publiee_quick"][value="' + value + '"]');
+            if (radio) { radio.checked = true; }
         };
     })();
     </script>
@@ -101,7 +99,7 @@ add_action('save_post_post', static function ($post_id) {
         return;
     }
     if (function_exists('update_field')) {
-        update_field('retombee_publiee', $value, $post_id);
+        update_field('field_6ae33ed9bf0c3', $value, $post_id);
     } else {
         update_post_meta($post_id, 'retombee_publiee', $value);
     }
