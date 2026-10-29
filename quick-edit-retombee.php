@@ -46,11 +46,13 @@ add_action('quick_edit_custom_box', static function ($column, $post_type) {
         return;
     }
     wp_nonce_field('gdd_retombee_quick_edit', 'gdd_retombee_quick_nonce');
-    echo '<fieldset class="inline-edit-col-right"><div class="inline-edit-col">';
-    echo '<span class="title">Retombées</span>';
-    echo '<label class="alignleft"><input type="radio" name="gdd_retombee_publiee_quick" value="publiee"> Publiée</label>';
-    echo '<label class="alignleft"><input type="radio" name="gdd_retombee_publiee_quick" value="apubliee" checked> À publier</label>';
-    echo '</div></fieldset>';
+    echo '<fieldset class="inline-edit-col-right gdd-retombee-quick-fieldset"><div class="inline-edit-col gdd-retombee-quick-col">';
+    echo '<div class="gdd-retombee-quick-box" role="group" aria-label="Retombées">';
+    echo '<strong class="gdd-retombee-quick-heading">Retombées</strong>';
+    echo '<div class="gdd-retombee-quick-options">';
+    echo '<label class="gdd-retombee-quick-option"><input type="radio" name="gdd_retombee_publiee_quick" value="publiee"><span>Publiée</span></label>';
+    echo '<label class="gdd-retombee-quick-option"><input type="radio" name="gdd_retombee_publiee_quick" value="apubliee" checked><span>À publier</span></label>';
+    echo '</div></div></div></fieldset>';
 }, 10, 2);
 
 add_action('admin_footer-edit.php', static function () {
@@ -59,6 +61,15 @@ add_action('admin_footer-edit.php', static function () {
         return;
     }
     ?>
+    <style>
+    .inline-edit-row .gdd-retombee-quick-fieldset { float: none !important; clear: both; width: 100%; padding: 0; margin: 12px 0 4px; box-sizing: border-box; }
+    .inline-edit-row .gdd-retombee-quick-col { float: none !important; width: 100%; padding: 0; margin: 0; }
+    .inline-edit-row .gdd-retombee-quick-box { box-sizing: border-box; padding: 12px 14px; border: 1px solid #c3c4c7; border-left: 4px solid #2271b1; border-radius: 4px; background: #f6f7f7; }
+    .inline-edit-row .gdd-retombee-quick-heading { display: block; float: none; width: auto; font-weight: 700; margin: 0 0 9px; color: #1d2327; }
+    .inline-edit-row .gdd-retombee-quick-options { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px; }
+    .inline-edit-row .gdd-retombee-quick-option { display: inline-flex !important; align-items: center; gap: 7px; float: none !important; margin: 0; width: auto; font-weight: 600; cursor: pointer; }
+    .inline-edit-row .gdd-retombee-quick-option input[type="radio"] { margin: 0 !important; }
+    </style>
     <script>
     (function() {
         if (typeof inlineEditPost === 'undefined' || !inlineEditPost.edit) { return; }
