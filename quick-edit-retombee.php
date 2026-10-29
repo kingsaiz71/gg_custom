@@ -43,7 +43,7 @@ add_action('admin_footer-edit.php', static function () {
         inlineEditPost.edit = function(id) {
             original.apply(this, arguments);
             var postId = (typeof id === 'object') ? this.getId(id) : id;
-            if (!/^\\d+$/.test(String(postId))) { return; }
+            if (!/^[0-9]+$/.test(String(postId))) { return; }
             var row = document.getElementById('post-' + postId);
             var editor = document.getElementById('edit-' + postId);
             if (!row || !editor) { return; }
