@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Gens de Goût – Fonctions personnalisées
  * Description: Shortcodes recettes, recherche, partage, intégration Yoast/Make et colonnes ACF, indépendants du thème Divi.
- * Version: 1.0.5
+ * Version: 1.0.6
  * Requires at least: 6.2
  * Requires PHP: 7.4
  * Author: Gens de Goût
