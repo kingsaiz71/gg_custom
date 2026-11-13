@@ -21,6 +21,24 @@ add_filter('acf/load_value/key=field_6ae33ed9bf0c3', static function ($value, $p
     return ($value === null || $value === '') ? 'apubliee' : $value;
 }, 10, 3);
 
+/**
+ * Sur l'écran d'édition complet d'un article, proposer « À publier »
+ * même si l'article dispose déjà d'une valeur enregistrée.
+ * Cette présélection ne change pas la base avant l'enregistrement du post.
+ * Les autres contextes ACF (API, affichage public, liste) restent inchangés.
+ */
+add_filter('acf/prepare_field/key=field_6ae33ed9bf0c3', static function ($field) {
+    if (!is_admin() || !function_exists('get_current_screen')) {
+        return $field;
+    }
+    $screen = get_current_screen();
+    if (!$screen || $screen->base !== 'post' || $screen->post_type !== 'post') {
+        return $field;
+    }
+    $field['value'] = 'apubliee';
+    return $field;
+}, 20);
+
 add_filter('manage_post_posts_columns', static function ($columns) {
     $result = [];
     $inserted = false;
