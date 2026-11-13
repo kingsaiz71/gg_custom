@@ -7,6 +7,20 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/**
+ * Valeur par défaut du champ ACF dans l'éditeur complet de l'article.
+ * Ne modifie pas la valeur enregistrée d'un article existant.
+ */
+add_filter('acf/load_field/key=field_6ae33ed9bf0c3', static function ($field) {
+    $field['default_value'] = 'apubliee';
+    return $field;
+});
+
+add_filter('acf/load_value/key=field_6ae33ed9bf0c3', static function ($value, $post_id, $field) {
+    // Uniquement pour les articles sans valeur déjà enregistrée.
+    return ($value === null || $value === '') ? 'apubliee' : $value;
+}, 10, 3);
+
 add_filter('manage_post_posts_columns', static function ($columns) {
     $result = [];
     $inserted = false;
