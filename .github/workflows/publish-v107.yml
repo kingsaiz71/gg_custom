@@ -1,0 +1,50 @@
+name: Publier GG Custom v1.0.7
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publish-v107.yml
+
+permissions:
+  contents: write
+
+jobs:
+  release-v107:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+
+      - name: Verifier la version et la syntaxe PHP
+        run: |
+          set -euo pipefail
+          grep -q 'Version: 1.0.7' gdd-fonctions-personnalisees.php
+          for file in gdd-fonctions-personnalisees.php fonctions-originales.php github-updater.php quick-edit-retombee.php; do
+            test -s "$file"
+            php -l "$file"
+          done
+
+      - name: Construire le ZIP installable
+        run: |
+          set -euo pipefail
+          mkdir -p dist/gdd-fonctions-personnalisees/includes
+          cp gdd-fonctions-personnalisees.php dist/gdd-fonctions-personnalisees/
+          cp fonctions-originales.php github-updater.php quick-edit-retombee.php dist/gdd-fonctions-personnalisees/includes/
+          cp README.md dist/gdd-fonctions-personnalisees/
+          (cd dist && zip -q -r ../gdd-fonctions-personnalisees-v1.0.7.zip gdd-fonctions-personnalisees)
+          unzip -t gdd-fonctions-personnalisees-v1.0.7.zip
+
+      - name: Creer la release v1.0.7
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.0.7 >/dev/null 2>&1; then
+            echo "Release v1.0.7 deja existante."
+            exit 0
+          fi
+          gh release create v1.0.7 gdd-fonctions-personnalisees-v1.0.7.zip \
+            --target "$GITHUB_SHA" \
+            --title "GG Custom — v1.0.7" \
+            --notes "Correction du champ Retombée Publiée : À publier présélectionné dans la modification rapide et l'édition complète des articles. ZIP WordPress avec arborescence includes vérifiée."
