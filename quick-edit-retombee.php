@@ -78,12 +78,11 @@ add_action('admin_footer-edit.php', static function () {
             original.apply(this, arguments);
             var postId = (typeof id === 'object') ? this.getId(id) : id;
             if (!/^[0-9]+$/.test(String(postId))) { return; }
-            var row = document.getElementById('post-' + postId);
             var editor = document.getElementById('edit-' + postId);
-            if (!row || !editor) { return; }
-            var state = row.querySelector('.gdd-retombee-value');
-            var value = state && state.getAttribute('data-value') === 'publiee' ? 'publiee' : 'apubliee';
-            var radio = editor.querySelector('input[name="gdd_retombee_publiee_quick"][value="' + value + '"]');
+            if (!editor) { return; }
+            // Préselectionner « À publier » à chaque ouverture de la modification rapide.
+            // Le statut enregistré en base ne change que si l’utilisateur enregistre.
+            var radio = editor.querySelector('input[name="gdd_retombee_publiee_quick"][value="apubliee"]');
             if (radio) { radio.checked = true; }
         };
     })();
